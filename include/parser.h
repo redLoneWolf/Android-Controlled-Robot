@@ -13,6 +13,7 @@ enum Command {
   BYE = 102,
   LED = 106,
   MOTOR= 107,
+  FLOAT_TEST = 109,
 };
 
 typedef enum Command command;
@@ -25,6 +26,7 @@ int convert_to_pwm(float motor_speed);
 
 Command read_order();
 
+void write_float(float num);
 
 void wait_for_bytes(int num_bytes, unsigned long timeout);
 

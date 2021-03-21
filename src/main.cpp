@@ -142,18 +142,20 @@ void checkHandshake()
 {
   if (connected)
   {
-    write_i8(ALREADY_CONNECTED);
+    // write_i8(ALREADY_CONNECTED);
+    write_float(12.3);
   }
   else
   {
     connected = true;
     // write_i8(HANDSHAKE);
 
-    while(count<=3){
-      serialBufferRX[count]=125;
-      count++;
-    }
-    sendPacket(count,HANDSHAKE,1);
+    // while(count<=3){
+    //   serialBufferRX[count]=125;
+    //   count++;
+    // }
+    // sendPacket(count,HANDSHAKE,1);
+    write_float(12.2);
 
   }
 }
