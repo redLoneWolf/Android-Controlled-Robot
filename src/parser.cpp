@@ -1,3 +1,5 @@
+// Thanks to Antonin RAFFIN https://medium.com/@araffin/simple-and-robust-computer-arduino-serial-communication-f91b95596788
+// code copied from https://github.com/araffin/cpp-arduino-serial/tree/2075fd8f203483af9c82caffba4bdbc84024ea63
 #include<parser.h>
 
 void wait_for_bytes(int num_bytes, unsigned long timeout)
@@ -61,6 +63,19 @@ void write_order(enum Command command)
 void write_i8(int8_t num)
 {
   Serial.write(num);
+}
+
+float readFloat(){
+
+    int8_t buffer[4];
+    for (int i = 0; i <4; i++)
+    {
+      buffer[i] = read_i8();
+    }
+    
+
+    float x = *(float *)&buffer;
+    return x;
 }
 
 void write_float(float num)

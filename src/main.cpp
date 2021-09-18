@@ -1,5 +1,5 @@
 #include <Arduino.h>
-
+#include <MotorDriver.h>
 #include <parameters.h>
 #include <parser.h>
 
@@ -8,6 +8,7 @@ char PREAMBLE = '$';
 
 uint8_t serialBufferRX[64];
 uint8_t count = 0;
+MotorDriver m;
 
 void setup()
 {
@@ -38,8 +39,6 @@ void led()
   // write_i8(104);
 }
 
-
-
 void sendHeader(int8_t size, Command command)
 {
   write_i8((byte)PREAMBLE); // $
@@ -51,26 +50,25 @@ void sendHeader(int8_t size, Command command)
 
 void sendPacket(int8_t size, Command command, int8_t data)
 {
-  sendHeader(size,command);
+  sendHeader(size, command);
 
-    int t =0;
-    while (t<=count)
-    {
-      write_i8(serialBufferRX[t]);
-      t++;
-    }
-    
-    
+  int t = 0;
+  while (t <= count)
+  {
+    write_i8(serialBufferRX[t]);
+    t++;
+  }
+
   // switch (size)
   // {
   // case 1:
   //   write_i8(data);
   //   break;
-  
+
   // case 2:
   //   write_i16(data);
   //   break;
-  
+
   // case 4:
   //   write_i32(data);
   //   break;
@@ -81,30 +79,48 @@ void sendPacket(int8_t size, Command command, int8_t data)
   // command
 }
 
+void writeMotor(int motorNo, int val)
+{
+
+  Directions dir;
+  if (val == -1)
+  {
+    dir = Brake;
+  }
+  else if (val == 0)
+  {
+    dir = Release;
+   
+  }
+  else if (val > 0) //forward if positive value
+  {
+    dir = Forward;
+  }
+
+  else if (val < -1) // backward if negative value
+  {
+    dir = Backward;
+  }
+  m.motor(motorNo, dir, abs(val));
+}
+unsigned long previousMillis = 0;
+const long interval = 500;
 void motor()
 {
-  uint8_t m1 = read_i8();
-  uint8_t m2 = read_i8();
-  uint8_t m3 = read_i8();
-  uint8_t m4 = read_i8();
+  int16_t motorsVals[4];
 
-  if (m1 == 255 && m2 == 255 && m3 == 255 && m4 == 255)
+  for (size_t i = 0; i < 4; i++)
   {
-
-    connected = false;
-
-    while(count<=3){
-      serialBufferRX[count]=125;
-      count++;
-    }
-    sendPacket(count,MOTOR,1);
-
+    motorsVals[i] = read_i16();
   }
-  else
+
+
+  for (size_t i = 1; i <= 4; i++)
   {
-    // write_i8(m1);
-    connected = true;
+    writeMotor(i, motorsVals[i - 1]);
   }
+
+
 }
 void checkCommand(Command command);
 
@@ -143,20 +159,27 @@ void checkHandshake()
   if (connected)
   {
     // write_i8(ALREADY_CONNECTED);
-    write_float(12.3);
+    while (count <= 3)
+    {
+      serialBufferRX[count] = 125;
+      count++;
+    }
+    sendPacket(count, ALREADY_CONNECTED, 1);
+
+    // write_float(12.3);
   }
   else
   {
     connected = true;
     // write_i8(HANDSHAKE);
 
-    // while(count<=3){
-    //   serialBufferRX[count]=125;
-    //   count++;
-    // }
-    // sendPacket(count,HANDSHAKE,1);
-    write_float(12.2);
-
+    while (count <= 3)
+    {
+      serialBufferRX[count] = 125;
+      count++;
+    }
+    sendPacket(count, HANDSHAKE, 1);
+    // write_float(12.2);
   }
 }
 

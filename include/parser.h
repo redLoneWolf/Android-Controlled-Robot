@@ -1,3 +1,6 @@
+// Thanks to Antonin RAFFIN https://medium.com/@araffin/simple-and-robust-computer-arduino-serial-communication-f91b95596788
+// code copied from https://github.com/araffin/cpp-arduino-serial/tree/2075fd8f203483af9c82caffba4bdbc84024ea63
+
 #include<Arduino.h>
 #include<stdint.h>
 #include<stddef.h>
@@ -21,10 +24,13 @@ typedef enum Command command;
 void stop();
 
 
-int convert_to_pwm(float motor_speed);
+
 
 
 Command read_order();
+
+
+float readFloat();
 
 void write_float(float num);
 
